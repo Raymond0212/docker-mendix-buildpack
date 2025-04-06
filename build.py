@@ -20,6 +20,9 @@ logging.basicConfig(
     stream=sys.stdout
 )
 
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
 def find_default_file(source, ext):
     if os.path.isfile(source):
         return source if source.name.endswith(ext) else None
@@ -131,10 +134,10 @@ def build_mpr_builder(mx_version, dotnet, artifacts_repository=None):
     mxbuild_url = f"https://download.mendix.com/runtimes/{mxbuild_filename}"
 
     build_args = ['--build-arg', f"MXBUILD_DOWNLOAD_URL={mxbuild_url}",
-                  '--file', os.path.join('mxbuild', f"{dotnet}.dockerfile"),
+                  '--file', os.path.join(SCRIPT_DIR, 'mxbuild', f"{dotnet}.dockerfile"),
                   '--tag', builder_image_url]
 
-    container_call(['image', 'build'] + build_args + ['mxbuild'])
+    container_call(['image', 'build'] + build_args + [os.path.join(SCRIPT_DIR, 'mxbuild')])
     if artifacts_repository is not None:
         try:
             container_call(['image', 'push', builder_image_url])
@@ -200,8 +203,15 @@ def prepare_destination(destination_path):
         os.makedirs(destination_path, 0o755)
     project_path = os.path.join(destination_path, 'project')
     os.mkdir(project_path, 0o755)
-    shutil.copytree('scripts', os.path.join(destination_path, 'scripts'))
-    shutil.copyfile('Dockerfile', os.path.join(destination_path, 'Dockerfile'))
+
+    scripts_path = os.path.join(SCRIPT_DIR, 'scripts')
+    dockerfile_path = os.path.join(SCRIPT_DIR, 'Dockerfile')
+    if not os.path.exists(scripts_path):
+        raise FileNotFoundError(f"'scripts' folder not found at: {scripts_path}")
+    if not os.path.exists(dockerfile_path):
+        raise FileNotFoundError(f"'Dockerfile' not found at: {dockerfile_path}")
+    shutil.copytree(scripts_path, os.path.join(destination_path, 'scripts'))
+    shutil.copyfile(dockerfile_path, os.path.join(destination_path, 'Dockerfile'))
     return project_path
 
 def prepare_mda(source_path, destination_path, artifacts_repository=None):
