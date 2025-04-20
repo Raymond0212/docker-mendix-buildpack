@@ -1,5 +1,4 @@
-#!/usr/bin/env bash
-# filepath: build-mda.sh
+#!/usr/bin/bash
 # This bash file require jq, docker, sqlite3 or sqlite, unzip, and tar to be installed. All of them are compatible with alpine.
 # Author: yongyanchen@crimsonlogic.com
 # copyright (c) 2023 CrimsonLogic Pte Ltd
@@ -98,7 +97,7 @@ build_mpr() {
   trap "docker container rm --force $cid" EXIT
 
   docker container cp "$src_dir/." "$cid:/workdir/project"
-  docker container ls -all "$src_dir"
+  docker container ls -a "$src_dir"
   docker start --attach --interactive "$cid"
 
   local dst_mda
@@ -129,7 +128,7 @@ prepare_destination() {
 prepare_mda() {
   local src=$1 dst=$2 art_repo=${3:-}
   prepare_destination "$dst"
-  ls -lf "$src"
+  ls -la "$src"
   local mpk mpr mda meta
   mpk=$(find_default_file "$src" .mpk)   && src=$(extract_zip "$mpk")
   echo "Extracted $mpk to $src"
