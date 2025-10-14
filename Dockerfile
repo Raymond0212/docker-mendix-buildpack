@@ -25,7 +25,7 @@ ARG BLOBSTORE
 ARG BUILDPACK_XTRACE
 
 # Set the user ID
-ARG USER_UID=1001
+ARG USER_UID=11001
 
 # Each comment corresponds to the script line:
 # 1. Create all directories needed by scripts
@@ -84,7 +84,7 @@ LABEL maintainer="digitalecosystems@mendix.com"
 ARG UNINSTALL_BUILD_DEPENDENCIES=true
 
 # Set the user ID
-ARG USER_UID=1001
+ARG USER_UID=11001
 # Set the home path
 ENV HOME=/opt/mendix/build
 
@@ -94,8 +94,8 @@ RUN chmod g=u /etc/passwd &&\
 
 # Uninstall Ubuntu packages which are only required during build time
 RUN if [ "$UNINSTALL_BUILD_DEPENDENCIES" = "true" ] && grep -q ubuntu /etc/os-release ; then\
-        DEBIAN_FRONTEND=noninteractive apt-mark manual libfontconfig1 && \
-        DEBIAN_FRONTEND=noninteractive apt-get remove --purge --auto-remove -q -y wget curl libgdiplus ; \
+    DEBIAN_FRONTEND=noninteractive apt-mark manual libfontconfig1 && \
+    DEBIAN_FRONTEND=noninteractive apt-get remove --purge --auto-remove -q -y wget curl libgdiplus ; \
     fi
 
 # Add the buildpack modules
